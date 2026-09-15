@@ -63,7 +63,11 @@ api_app = FastAPI(
 
 api_app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://demurrage-revenue-platform.vercel.app",  # production
+        "http://localhost:3000",                          # local dev
+    ],
+    allow_origin_regex=r"^https://demurrage-revenue-platform-[a-z0-9\-]+\.vercel\.app$",  # preview deploys
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -91,27 +95,6 @@ class LoginRequest(BaseModel):
 
 
 @api_app.post("/api/v1/auth/login")
-def login(payload: LoginRequest):
-    user = UserRepository.get_by_username(payload.username)
-    if user is None or not verify_password(payload.password, user["password_hash"]):
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-    UserRepository.touch_last_login(user["id"])
-    AuditLogger.log("USER", user["id"], "LOGIN", user["full_name"], user["role"], details="Successful login")
-    token = create_access_token(user["id"], user["username"], user["role"], user["full_name"])
-    return {"access_token": token, "token_type": "bearer", "user": _safe_user(user)}
-
-
-@api_app.get("/api/v1/auth/me")
-def read_current_user(user: Dict[str, Any] = Depends(get_current_user)):
-    return _safe_user(user)
-
-
-@api_app.get("/api/v1/auth/demo-accounts")
-def demo_accounts():
-    """Public directory of demo role accounts for the login page - usernames and roles only, never passwords."""
-    return {"data": UserRepository.list_active()}
-
 
 class RegisterRequest(BaseModel):
     username: str
