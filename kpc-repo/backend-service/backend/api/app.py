@@ -64,7 +64,7 @@ api_app = FastAPI(
 api_app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://demurrage-revenue-platform.vercel.app",  # production
+        "demurrage-revenue-platform-e3yw0uoz6-scaffold4.vercel.app",  # production
         "http://localhost:3000",                          # local dev
     ],
     allow_origin_regex=r"^https://demurrage-revenue-platform-[a-z0-9\-]+\.vercel\.app$",  # preview deploys
