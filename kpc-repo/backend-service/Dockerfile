@@ -18,6 +18,6 @@ RUN mkdir -p /app/data
 EXPOSE 8000
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=5 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-CMD ["uvicorn", "backend.api.app:api_app", "--host", "0.0.0.0", "--port", "8000"]
+CMD uvicorn backend.api.app:api_app --host 0.0.0.0 --port ${PORT:-8000}
